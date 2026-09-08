@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLACKIA - میرا Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #d4af37;
+        }
+
+        .logo h1 {
+            color: #d4af37;
+            font-size: 28px;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #d4af37 0%, #ffaa00 100%);
+            color: #1a1a1a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .welcome-box {
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .welcome-text {
+            color: #d4af37;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .user-email {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: #ffaa00;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .card h3 {
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .profile-section {
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .profile-section h2 {
+            color: #d4af37;
+            margin-bottom: 15px;
+        }
+
+        .profile-info {
+            display: grid;
+            gap: 10px;
+        }
+
+        .info-item {
+            background: rgba(212, 175, 55, 0.05);
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 3px solid #d4af37;
+        }
+
+        .info-label {
+            color: #d4af37;
+            font-size: 12px;
+        }
+
+        .info-value {
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #d4af37;
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <h1>BLACKIA</h1>
+        </div>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+    </div>
+
+    <div id="content" class="loading">
+        <p>📦 Dashboard لاڈ ہو رہی ہے...</p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB4NUuBGGDDignA55z_IfNU78e7l2-T3vE",
+            authDomain: "blckiashoes.firebaseapp.com",
+            projectId: "blckiashoes",
+            storageBucket: "blckiashoes.firebasestorage.app",
+            messagingSenderId: "264597463698",
+            appId: "1:264597463698:web:aa7eee5cca0f1bbd547c4b"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        firebase.auth().onAuthStateChanged(async function(user) {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const docSnap = await db.collection('customers').doc(user.uid).get();
+                let userData = { email: user.email };
+
+                if (docSnap.exists) {
+                    userData = docSnap.data();
+                }
+
+                document.getElementById('content').innerHTML = `
+                    <div class="welcome-box">
+                        <div class="welcome-text">👋 خوش آمدید، ${userData.fullName || 'مہمان'}!</div>
+                        <div class="user-email">📧 ${user.email}</div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="card" onclick="alert('Store coming soon!')">
+                            <h3>🛍️</h3>
+                            <h3>دکان</h3>
+                            <p>جوتیوں کو براؤز کریں</p>
+                        </div>
+                        <div class="card" onclick="alert('Orders coming soon!')">
+                            <h3>📦</h3>
+                            <h3>میرے آرڈرز</h3>
+                            <p>اپنی خریداری دیکھیں</p>
+                        </div>
+                        <div class="card" onclick="alert('Wishlist coming soon!')">
+                            <h3>❤️</h3>
+                            <h3>پسندیدہ</h3>
+                            <p>محفوظ شدہ جوتیاں</p>
+                        </div>
+                        <div class="card" onclick="alert('Settings coming soon!')">
+                            <h3>⚙️</h3>
+                            <h3>ترتیبات</h3>
+                            <p>اپنا پروفائل سنوارو</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <h2>📋 میرا پروفائل</h2>
+                        <div class="profile-info">
+                            <div class="info-item">
+                                <div class="info-label">مکمل نام</div>
+                                <div class="info-value">${userData.fullName || 'ابھی سیٹ نہیں'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">ای میل</div>
+                                <div class="info-value">${user.email}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">فون نمبر</div>
+                                <div class="info-value">${userData.phoneNumber || 'ابھی سیٹ نہیں'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">شہر</div>
+                                <div class="info-value">${userData.city || 'ابھی سیٹ نہیں'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                document.getElementById('content').innerHTML = '<p>❌ خرابی واقع ہوئی</p>';
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async function() {
+            await auth.signOut();
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>
